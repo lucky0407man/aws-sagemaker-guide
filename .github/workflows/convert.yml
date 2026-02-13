@@ -1,0 +1,31 @@
+name: Convert Markdown to Word
+
+on:
+  push:
+    paths:
+      - '**.md'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  convert:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Install Pandoc
+        run: sudo apt-get update && sudo apt-get install -y pandoc
+
+      - name: Convert Markdown to DOCX
+        run: pandoc AWS-SageMaker-Guide.md -o AWS-SageMaker-Guide.docx
+
+      - name: Commit and Push
+        run: |
+          git config --global user.name 'GitHub Action'
+          git config --global user.email 'action@github.com'
+          git add AWS-SageMaker-Guide.docx
+          git commit -m "Auto-generate Word document from Markdown" || echo "No changes to commit"
+          git push
